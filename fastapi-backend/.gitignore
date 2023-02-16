@@ -1,0 +1,10 @@
+config.py
+__pycache__/
+.env/
+*.txt
+*.mp3
+*.mp4
+*.srt
+*.json
+*.tsv
+*.vtt
