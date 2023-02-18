@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from fastapi import FastAPI, HTTPException
-import youtube_dl
+#import youtube_dl   # old
+import yt_dlp as youtube_dl # new replacement  https://pypi.org/project/yt-dlp/
 import re
 import asyncio
 import os
@@ -194,10 +195,57 @@ async def get_files():
 #    return {"status": "transcription started"}
 
 
-@app.post("/transcribe")
-def transcribe_audio(payload: dict):
+# def transcribe_audio_as_thread(file_name):
+#     # needs to be standalone function, do not nest this function
+#     # otherwise multiprocessing cannot pickle this
+#     file_path = os.path.join("./", file_name)
+#     if not os.path.exists(file_path):
+#         raise HTTPException(status_code=400, detail="file not found")
 
-    def transcribe_audio_as_thread(file_name):
+#     result_file = file_name.replace(".mp3", ".txt")
+#     result_file_path = os.path.join("./", result_file)
+
+#     command = f"whisper {file_path} --model tiny > {result_file_path}"
+#     process = subprocess.Popen(command, shell=True)
+#     process.wait()
+
+# @app.post("/transcribe")
+# def transcribe_audio(payload: dict):
+#     file_name = payload.get("file_name")
+#     if not file_name:
+#         raise HTTPException(status_code=400, detail="file_name is required")
+
+#     if not file_name.endswith(".mp3"):
+#         raise HTTPException(status_code=400, detail="File must be of type .mp3")
+
+#     logging.info(f"Starting transcription for file: {file_name}")
+#     process = multiprocessing.Process(
+#         target=transcribe_audio_as_thread, args=(file_name,)
+#     )
+
+#     p = psutil.Process(process.pid)
+#     p.nice(19)  # 19 is the nicest
+#     p.ionice(psutil.IOPRIO_CLASS_IDLE)
+
+#     process.start()
+#     logging.info(f"Transcription started for file: {file_name}")
+#     return {"status": "transcription started"}
+
+
+
+def transcribe_audio_as_thread(file_name):
+    # https://github.com/openai/whisper
+    # Run some long running AI transcription process on the .mp3 file
+    # ...
+    #model = whisper.load_model("tiny")     # 1GB RAM
+    #model = whisper.load_model("base")     # 1GB RAM
+    #model = whisper.load_model("small")    # 2GB RAM
+    #model = whisper.load_model("medium")   # 5GB RAM
+    #model = whisper.load_model("large")    # 10GB RAM
+
+    model_size = "small"
+
+    try:
         file_path = os.path.join("./", file_name)
         if not os.path.exists(file_path):
             raise HTTPException(status_code=400, detail="file not found")
@@ -205,30 +253,57 @@ def transcribe_audio(payload: dict):
         result_file = file_name.replace(".mp3", ".txt")
         result_file_path = os.path.join("./", result_file)
 
-        command = f"whisper {file_path} --model tiny > {result_file_path}"
+        command = f"whisper {file_path} --model {model_size} > {result_file_path}"
         process = subprocess.Popen(command, shell=True)
         process.wait()
+    except Exception as e:
+        logging.error(f"Error while transcribing audio: {e}")
+        raise HTTPException(status_code=500, detail="Error while transcribing audio")
 
 
-    file_name = payload.get("file_name")
-    if not file_name:
-        raise HTTPException(status_code=400, detail="file_name is required")
 
-    if not file_name.endswith(".mp3"):
-        raise HTTPException(status_code=400, detail="File must be of type .mp3")
 
-    logging.info(f"Starting transcription for file: {file_name}")
-    process = multiprocessing.Process(
-        target=transcribe_audio_as_thread, args=(file_name,)
-    )
+@app.post("/transcribe")
+def transcribe_audio(payload: dict):
+    #Another potential issue is that the code is starting a new multiprocessing process for each transcription request. 
+    #This can be inefficient and may cause the server to become overloaded if there are many concurrent requests.
+    #To address this, a better approach would be to use a task queue or job scheduler to manage the transcription requests. 
+    #For example, you could use a message broker like RabbitMQ or Apache Kafka 
+    #to receive incoming transcription requests and distribute them to a pool of worker processes. 
+    #This would allow you to process multiple requests concurrently and avoid the overhead 
+    #of starting and stopping Python processes for each request.
+    try:
+        file_name = payload.get("file_name")
+        if not file_name:
+            raise HTTPException(status_code=400, detail="file_name is required")
 
-    p = psutil.Process(process.pid)
-    p.nice(19)  # 19 is the nicest
-    p.ionice(psutil.IOPRIO_CLASS_IDLE)
+        if not file_name.endswith(".mp3"):
+            raise HTTPException(status_code=400, detail="File must be of type .mp3")
 
-    process.start()
-    logging.info(f"Transcription started for file: {file_name}")
-    return {"status": "transcription started"}
+        logging.info(f"Starting transcription for file: {file_name}")
+        process = multiprocessing.Process(
+            target=transcribe_audio_as_thread, args=(file_name,)
+        )
+
+        p = psutil.Process(process.pid)
+        p.nice(19)  # 19 is the nicest
+        p.ionice(psutil.IOPRIO_CLASS_IDLE)
+
+        process.start()
+        logging.info(f"Transcription started for file: {file_name}")
+        return {"status": "transcription started"}
+    except HTTPException as e:
+        logging.error(f"Error while transcribing audio: {e}")
+        raise
+    except Exception as e:
+        logging.error(f"Error while transcribing audio: {e}")
+        raise HTTPException(status_code=500, detail="Error while transcribing audio")
+
+
+
+
+
+
 
 
 # @app.get("/text_chunks/{file_name}")
@@ -285,24 +360,60 @@ async def read_textfile(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
 
 
+# @app.post("/split")
+# async def split_file(payload: dict):
+#     # function receives name of the file and splits it into smaller files
+#     # each containing max n lines
+#     # this limits chunk size so GPT can translate it properly
+#     filename = payload.get("filename")
+#     num_lines = 60  # split into files per 30 lines
+
+#     try:
+#         with open(filename, "r") as file:
+#             lines = file.readlines()
+#             for i in range(0, len(lines), num_lines):
+#                 with open("output_" + str(i // num_lines) + ".txt", "w") as outfile:
+#                     outfile.writelines(lines[i : i + num_lines])
+#         return {"status": "Splitting job started."}
+#     except Exception as e:
+#         print(e)
+#         raise HTTPException(status_code=400, detail=str(e))
+
 @app.post("/split")
 async def split_file(payload: dict):
     # function receives name of the file and splits it into smaller files
     # each containing max n lines
     # this limits chunk size so GPT can translate it properly
     filename = payload.get("filename")
-    num_lines = 5  # split into files per 30 lines
+    num_lines = 15  # split into files per 30 lines, optimal length for cheaper GPT models
 
     try:
         with open(filename, "r") as file:
             lines = file.readlines()
             for i in range(0, len(lines), num_lines):
-                with open("output_" + str(i // num_lines) + ".txt", "w") as outfile:
+                file_num = i // num_lines
+                outfile_name = "output_{:03d}.txt".format(file_num)
+                with open(outfile_name, "w") as outfile:
                     outfile.writelines(lines[i : i + num_lines])
         return {"status": "Splitting job started."}
     except Exception as e:
         print(e)
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # @app.post("/process_split_files")
@@ -357,7 +468,7 @@ async def process_files(payload: dict):
         with open(f"{worktype}_{prefix}.{suffix}", "w") as outfile:
             # we need to join the files in sequence
             for file in sorted(os.listdir()):
-                if file.startswith(f"translation_{prefix}"):
+                if file.startswith(f"{worktype}_{prefix}"):
                     with open(file, "r") as infile:
                         outfile.write(infile.read())
 

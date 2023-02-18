@@ -146,8 +146,8 @@ function VideoText() {
 
       <div className="flex">
 
-        <Form prefix="" filename_prop="01一生のお願い教科書にない日本語9N_A7KEiXhg.mp3.txt" onFormSubmit={handleFormSubmit_1} />
-        <Form prefix="translation" filename_prop="01一生のお願い教科書にない日本語9N_A7KEiXhg.mp3.txt" onFormSubmit={handleFormSubmit_2} />
+        <Form prefix="" filename_prop="1年レビューiPadmini6が最高のiPadだと思う理由mE_f7lGtAlQ.mp3.txt" onFormSubmit={handleFormSubmit_1} />
+        <Form prefix="translation" filename_prop="1年レビューiPadmini6が最高のiPadだと思う理由mE_f7lGtAlQ.mp3.txt" onFormSubmit={handleFormSubmit_2} />
         <Navigation prefix="original" filename={formValue1_1} chunkNum={Number(formValue2_1)} chunkSize={Number(formValue3_1)} setFilename={setFormValue1_1} setChunkNum={setFormValue2_1} setChunkSize={setFormValue3_1} />
         <Navigation prefix="translation" filename={formValue1_2} chunkNum={Number(formValue2_2)} chunkSize={Number(formValue3_2)} setFilename={setFormValue1_2} setChunkNum={setFormValue2_2} setChunkSize={setFormValue3_2} />
 
@@ -237,7 +237,7 @@ function VideoText() {
             <li className="nav-item" role="presentation">
               <a href="#tabs-home" className="nav-link block font-medium text-xs leading-tight uppercase border-x-0 border-t-0 border-b-2 border-transparent px-6 py-3 my-2 hover:border-transparent hover:bg-gray-100 focus:border-transparent active"
                 id="tabs-home-tab" data-bs-toggle="pill" data-bs-target="#tabs-home" role="tab" aria-controls="tabs-home"
-                aria-selected="true">Vocab</a>
+                aria-selected="true">Vocabulary</a>
             </li>
             <li className="nav-item" role="presentation">
               <a href="#tabs-profile" className="nav-link block font-medium text-xs leading-tight uppercase border-x-0 border-t-0 border-b-2 border-transparent px-6 py-3 my-2 hover:border-transparent hover:bg-gray-100 focus:border-transparent"
@@ -253,7 +253,7 @@ function VideoText() {
           <div className="tab-content" id="tabs-tabContent">
             <div className="tab-pane fade show active" id="tabs-home" role="tabpanel" aria-labelledby="tabs-home-tab">
               Tab 1 content
-              <FullTextCard prefix="vocab" filename={formValue1_1} />
+              <FullTextCard prefix="vocabulary" filename={formValue1_1} />
             </div>
             <div className="tab-pane fade" id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
               Tab 2 content
