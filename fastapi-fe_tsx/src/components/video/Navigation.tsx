@@ -19,15 +19,40 @@ import React, { useState, useEffect } from 'react';
   const Navigation: React.FC<NavigationProps> = ({ prefix, chunkNum, setChunkNum, filename, chunkSize }) => {
     const [maxChunks, setMaxChunks] = useState(0);
   
+    // useEffect(() => {
+    //   const fetchMaxChunks = async () => {
+    //     console.log('navigation api call to fetch max chunks');
+    //     const response = await fetch(`http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`);
+    //     const data = await response.json();
+    //     setMaxChunks(data.total_chunks);
+    //   };
+    //   fetchMaxChunks();
+    // }, [filename, chunkSize]);
+
     useEffect(() => {
       const fetchMaxChunks = async () => {
         console.log('navigation api call to fetch max chunks');
-        const response = await fetch(`http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`);
-        const data = await response.json();
-        setMaxChunks(data.total_chunks);
+        try {
+          const response = await fetch(`http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+            },
+          });
+          const data = await response.json();
+          setMaxChunks(data.total_chunks);
+        } catch (error) {
+          console.error(error);
+        }
       };
       fetchMaxChunks();
     }, [filename, chunkSize]);
+    
+
+
+
+
   
     const handlePrev = () => {
       if (chunkNum > 0) {

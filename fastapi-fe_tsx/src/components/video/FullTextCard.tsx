@@ -8,13 +8,42 @@ interface FullTextCardProps {
 const FullTextCard: React.FC<FullTextCardProps> = ({ prefix, filename }) => {
   const [textChunk, setTextChunk] = useState("");
 
+  // const handleSubmit = async () => {
+  //   const response = await fetch(
+  //     `http://localhost:8000/textfiles/${prefix}_${filename}`
+  //   );
+  //   const data = await response.json();
+  //   setTextChunk(data.file_contents);
+  // };
+
   const handleSubmit = async () => {
-    const response = await fetch(
-      `http://localhost:8000/textfiles/${prefix}_${filename}`
-    );
-    const data = await response.json();
-    setTextChunk(data.file_contents);
+    try {
+      const response = await fetch(`http://localhost:8000/textfiles/${prefix}_${filename}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      setTextChunk(data.file_contents);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
+  
+
+
+
+
+
+
+
 
   useEffect(() => {
     if (filename !== 'default') {

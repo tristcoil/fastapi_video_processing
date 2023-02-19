@@ -18,6 +18,10 @@ import multiprocessing
 
 app = FastAPI(port=8000)
 
+
+# Yes, allowing all origins on the backend is not enough. You also need to 
+# set the appropriate CORS headers on the frontend to allow the request to go through.
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -19,17 +19,42 @@ const ProcessSplitFiles: React.FC<Props> = ({ workType }) => {
       setStatus("File must be in .txt format");
       return;
     }
-    axios
-      .post("http://localhost:8000/process_split_files", { filename: fileName, worktype: workType })
-      .then((response) => {
-        console.log(response.data);
-        setFileName("");
-        setStatus(response.data.status);
-      })
-      .catch((error) => {
-        console.error(error);
-        setStatus("Error while processing split files");
-      });
+
+
+
+    // axios
+    //   .post("http://localhost:8000/process_split_files", { filename: fileName, worktype: workType })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setFileName("");
+    //     setStatus(response.data.status);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     setStatus("Error while processing split files");
+    //   });
+
+    axios.post("http://localhost:8000/process_split_files", 
+    { 
+      filename: fileName, 
+      worktype: workType 
+    }, 
+    { 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      } 
+    })
+    .then((response) => {
+      console.log(response.data);
+      setFileName("");
+      setStatus(response.data.status);
+    })
+    .catch((error) => {
+      console.error(error);
+      setStatus("Error while processing split files");
+    });
+  
   };
 
   return (

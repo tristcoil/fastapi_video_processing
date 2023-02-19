@@ -19,8 +19,28 @@ const TranscribeAudio: React.FC<TranscribeAudioProps> = () => {
       setStatus("File must be in .mp3 format");
       return;
     }
-    axios
-      .post("http://localhost:8000/transcribe", { file_name: fileName })
+
+
+    // axios
+    //   .post("http://localhost:8000/transcribe", { file_name: fileName })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setFileName("");
+    //     setStatus(response.data.status);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     setStatus("Error while transcribing audio");
+    //   });
+
+    axios.post(
+      "http://localhost:8000/transcribe",
+      { file_name: fileName },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: false,
+      }
+    )
       .then((response) => {
         console.log(response.data);
         setFileName("");
@@ -30,6 +50,12 @@ const TranscribeAudio: React.FC<TranscribeAudioProps> = () => {
         console.error(error);
         setStatus("Error while transcribing audio");
       });
+    
+
+
+
+
+
   };
 
   return (

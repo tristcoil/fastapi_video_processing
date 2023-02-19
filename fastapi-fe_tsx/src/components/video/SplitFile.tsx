@@ -22,8 +22,31 @@ const SplitFile: React.FC = () => {
       setState({ ...state, status: "File must be in .txt format" });
       return;
     }
-    axios
-      .post("http://localhost:8000/split", { filename: state.fileName })
+
+
+
+
+    // axios
+    //   .post("http://localhost:8000/split", { filename: state.fileName })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setState({ fileName: "", status: response.data.status });
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     setState({ ...state, status: "Error while splitting file" });
+    //   });
+
+    axios.post(
+      "http://localhost:8000/split",
+      { filename: state.fileName },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: false,
+      }
+    )
       .then((response) => {
         console.log(response.data);
         setState({ fileName: "", status: response.data.status });
@@ -32,6 +55,14 @@ const SplitFile: React.FC = () => {
         console.error(error);
         setState({ ...state, status: "Error while splitting file" });
       });
+    
+
+
+
+
+
+
+
   };
 
   return (

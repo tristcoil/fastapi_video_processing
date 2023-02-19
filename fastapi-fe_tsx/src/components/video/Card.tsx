@@ -20,6 +20,19 @@ const Card: React.FC<CardProps> = ({ prefix, filename, chunkNum, chunkSize }) =>
     mod_filename = `${prefix}_${filename}`;
   } 
 
+  // const handleSubmit = async () => {
+  //   let uri = '';
+  //   if (prefix === '') {
+  //     uri = `http://localhost:8000/text_chunks/${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+  //   } else {
+  //     uri = `http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+  //   }
+  //   const response = await fetch(uri);
+  //   const data = await response.json();
+  //   setTotalChunks(data.total_chunks);
+  //   setTextChunk(data.chunk);
+  // };
+
   const handleSubmit = async () => {
     let uri = '';
     if (prefix === '') {
@@ -27,11 +40,27 @@ const Card: React.FC<CardProps> = ({ prefix, filename, chunkNum, chunkSize }) =>
     } else {
       uri = `http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
     }
-    const response = await fetch(uri);
-    const data = await response.json();
-    setTotalChunks(data.total_chunks);
-    setTextChunk(data.chunk);
+    try {
+      const response = await fetch(uri, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setTotalChunks(data.total_chunks);
+      setTextChunk(data.chunk);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // handle error in UI
+    }
   };
+
+
 
   useEffect(() => {
     if (filename !== 'default') {

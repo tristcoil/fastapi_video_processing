@@ -23,8 +23,27 @@ const DownloadAudio: React.FC<DownloadAudioProps> = () => {
       return;
     }
 
-    axios
-      .post("http://localhost:8000/download", { video_url: videoUrl })
+    // axios
+    //   .post("http://localhost:8000/download", { video_url: videoUrl })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setVideoUrl("");
+    //     setErrorMessage("");
+    //     setStatus(response.data.status);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     setErrorMessage("An error occurred while making the API call");
+    //   });
+
+    axios.post(
+      "http://localhost:8000/download",
+      { video_url: videoUrl },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true
+      }
+    )
       .then((response) => {
         console.log(response.data);
         setVideoUrl("");
@@ -35,7 +54,18 @@ const DownloadAudio: React.FC<DownloadAudioProps> = () => {
         console.error(error);
         setErrorMessage("An error occurred while making the API call");
       });
+    
+    
+
+
+
   };
+
+
+
+
+
+
 
   return (
     <div>
