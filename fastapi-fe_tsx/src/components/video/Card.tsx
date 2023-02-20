@@ -36,9 +36,11 @@ const Card: React.FC<CardProps> = ({ prefix, filename, chunkNum, chunkSize }) =>
   const handleSubmit = async () => {
     let uri = '';
     if (prefix === '') {
-      uri = `http://localhost:8000/text_chunks/${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+      //uri = `http://localhost:8000/api/text_chunks/${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+      uri = `/api/text_chunks/${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
     } else {
-      uri = `http://localhost:8000/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+      //uri = `http://localhost:8000/api/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
+      uri = `/api/text_chunks/${prefix}_${filename}?chunk_num=${chunkNum}&chunk_size=${chunkSize}`;
     }
     try {
       const response = await fetch(uri, {

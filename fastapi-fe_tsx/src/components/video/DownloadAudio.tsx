@@ -37,7 +37,8 @@ const DownloadAudio: React.FC<DownloadAudioProps> = () => {
     //   });
 
     axios.post(
-      "http://localhost:8000/download",
+      //"http://localhost:8000/api/download",
+      "/api/download",
       { video_url: videoUrl },
       {
         headers: { "Content-Type": "application/json" },

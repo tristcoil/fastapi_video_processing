@@ -34,7 +34,8 @@ const TranscribeAudio: React.FC<TranscribeAudioProps> = () => {
     //   });
 
     axios.post(
-      "http://localhost:8000/transcribe",
+      //"http://localhost:8000/api/transcribe",
+      "/api/transcribe",
       { file_name: fileName },
       {
         headers: { "Content-Type": "application/json" },

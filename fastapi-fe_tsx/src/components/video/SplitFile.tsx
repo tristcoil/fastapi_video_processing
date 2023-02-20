@@ -38,7 +38,8 @@ const SplitFile: React.FC = () => {
     //   });
 
     axios.post(
-      "http://localhost:8000/split",
+      //"http://localhost:8000/api/split",
+      "/api/split",
       { filename: state.fileName },
       {
         headers: {

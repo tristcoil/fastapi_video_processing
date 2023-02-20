@@ -19,6 +19,19 @@ import multiprocessing
 app = FastAPI(port=8000)
 
 
+# How to fix following error:
+# basically we need to use https, at least self signed on nginx level for now 
+# Access to fetch at '' from origin '' has been blocked by CORS policy: 
+# The request client is not a secure context and the resource is in more-private address space `local`.
+# https://stackoverflow.com/questions/66534759/cors-error-on-request-to-localhost-dev-server-from-remote-site
+# https://kb.tableau.com/articles/Issue/cors-error-the-request-client-is-not-a-secure-context-and-the-resource-is-in-more-private-address-space-occurs-in-the-browser-devtools-console-and-embedded-views-cannot-be-displayed
+# https://www.appeon.com/developers/get-help/knowledgebase/failed-start-application-http-connection-edgechrome-due-cors-policy.html
+# https://community.homey.app/t/at-recovery-homey-not-responding-rootcause-cors-policy-enforced-by-chrome-v94-and-higher-how-to-disable-cors/54166/7
+# https://developer.okta.com/blog/2021/08/02/fix-common-problems-cors
+# https://talk.observablehq.com/t/blocked-by-cors-policy-at-chrome/5654/8
+
+
+
 # Yes, allowing all origins on the backend is not enough. You also need to 
 # set the appropriate CORS headers on the frontend to allow the request to go through.
 
@@ -32,7 +45,7 @@ app.add_middleware(
 
 
 
-@app.post("/download")
+@app.post("/api/download")
 async def transcribe_audio(payload: dict):
     video_url = payload.get("video_url")
     if not video_url:
@@ -106,7 +119,7 @@ async def transcribe_audio(payload: dict):
 
 
 
-@app.get("/files/audio")
+@app.get("/api/files/audio")
 async def get_files():
     import os
 
@@ -115,7 +128,7 @@ async def get_files():
     return {"files": files}
 
 
-@app.get("/files/text")
+@app.get("/api/files/text")
 async def get_files():
     import os
 
@@ -267,7 +280,7 @@ def transcribe_audio_as_thread(file_name):
 
 
 
-@app.post("/transcribe")
+@app.post("/api/transcribe")
 def transcribe_audio(payload: dict):
     #Another potential issue is that the code is starting a new multiprocessing process for each transcription request. 
     #This can be inefficient and may cause the server to become overloaded if there are many concurrent requests.
@@ -327,7 +340,7 @@ def transcribe_audio(payload: dict):
 #    return {"total_chunks": total_chunks, "chunk_num": chunk_num, "chunk": chunk}
 
 
-@app.get("/text_chunks/{file_name}")
+@app.get("/api/text_chunks/{file_name}")
 async def get_text_chunks(file_name: str, chunk_num: int = 0, chunk_size: int = 30):
     file_name_decoded = urllib.parse.unquote(file_name)
     file_path = os.path.join("./", file_name_decoded)
@@ -352,7 +365,7 @@ async def get_text_chunks(file_name: str, chunk_num: int = 0, chunk_size: int = 
     return response
 
 
-@app.get("/textfiles/{filename}")
+@app.get("/api/textfiles/{filename}")
 async def read_textfile(filename: str):
     # returns full contents of a file, preserves newlines
     # automatically looks for files in current dir
@@ -383,7 +396,7 @@ async def read_textfile(filename: str):
 #         print(e)
 #         raise HTTPException(status_code=400, detail=str(e))
 
-@app.post("/split")
+@app.post("/api/split")
 async def split_file(payload: dict):
     # function receives name of the file and splits it into smaller files
     # each containing max n lines
@@ -441,7 +454,7 @@ async def split_file(payload: dict):
 #        raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/process_split_files")
+@app.post("/api/process_split_files")
 async def process_files(payload: dict):
     # How to get around token limits
     # https://blog.devgenius.io/how-to-get-around-openai-gpt-3-token-limits-b11583691b32

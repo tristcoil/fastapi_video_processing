@@ -19,14 +19,17 @@ const ListFiles: React.FC<ListFilesProps> = (props) => {
   // }, [props.type]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/files/${props.type}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      mode: 'cors',
-    })
+    fetch(
+      //`http://localhost:8000/api/files/${props.type}`,
+      `/api/files/${props.type}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        mode: 'cors',
+      })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -42,7 +45,7 @@ const ListFiles: React.FC<ListFilesProps> = (props) => {
         setIsLoading(false);
       });
   }, [props.type]);
-  
+
 
 
 
